@@ -832,8 +832,8 @@ function TimePicker({ value, onChange, compact }) {
   };
 
   const handleHourPick = (h) => {
-    setSelHour(h);
-    setMode("min");
+    onChange(h * 60 + selMin);
+    setOpen(false);
   };
 
   const handleMinPick = (m) => {
@@ -864,19 +864,9 @@ function TimePicker({ value, onChange, compact }) {
           <div style={styles.tpPopup} onClick={(e) => e.stopPropagation()}>
             <div style={styles.tpHeader}>
               <span style={styles.tpTitle}>
-                {mode === "hour" ? "시간 선택" : `${selHour}시 - 분 선택`}
+                {mode === "hour" ? "시간 선택" : "분 선택"}
               </span>
               <button onClick={() => setOpen(false)} style={styles.tpClose}>✕</button>
-            </div>
-            <div style={styles.tpModeRow}>
-              <button onClick={() => setMode("hour")} style={{ ...styles.tpModeBtn, ...(mode === "hour" ? styles.tpModeBtnActive : {}) }}>
-                <span style={styles.tpModeLabel}>시간</span>
-                <span style={styles.tpModeValue}>{selHour === 0 ? "0(24)" : String(selHour).padStart(2, "0")}</span>
-              </button>
-              <button onClick={() => setMode("min")} style={{ ...styles.tpModeBtn, ...(mode === "min" ? styles.tpModeBtnActive : {}) }}>
-                <span style={styles.tpModeLabel}>분</span>
-                <span style={styles.tpModeValue}>{String(selMin).padStart(2, "0")}</span>
-              </button>
             </div>
             {mode === "hour" ? (
               <div style={styles.tpGrid}>
@@ -1641,21 +1631,9 @@ const styles = {
     background: "#1e222a", color: "#888", fontSize: 14, cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
-  tpModeRow: {
-    display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8,
-    padding: "12px 12px 8px",
-  },
-  tpModeBtn: {
-    border: "1px solid #28303a", borderRadius: 10, background: "#161a22",
-    color: "#8a95a8", cursor: "pointer", padding: "8px 6px",
-    display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-  },
-  tpModeBtnActive: { borderColor: "#3a7bd5", background: "#1a3a5c", color: "#7cb8ff" },
-  tpModeLabel: { fontSize: 11, fontWeight: 700 },
-  tpModeValue: { fontSize: 18, fontWeight: 800, lineHeight: 1.2 },
   tpGrid: {
     display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4,
-    padding: "8px 12px 16px",
+    padding: "12px 12px 16px",
   },
   tpGridMin: {
     gridTemplateColumns: "repeat(4, 1fr)", maxWidth: 204, margin: "0 auto",
