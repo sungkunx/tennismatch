@@ -824,10 +824,10 @@ function TimePicker({ value, onChange, compact }) {
   const [selMin, setSelMin] = useState(value % 60);
   const [mode, setMode] = useState("hour"); // "hour" or "min"
 
-  const handleOpen = () => {
+  const handleOpen = (nextMode) => {
     setSelHour(Math.floor(value / 60));
     setSelMin(value % 60);
-    setMode("hour");
+    setMode(nextMode);
     setOpen(true);
   };
 
@@ -844,12 +844,21 @@ function TimePicker({ value, onChange, compact }) {
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const mins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+  const currentHour = Math.floor(value / 60);
+  const currentMin = value % 60;
+  const triggerBtnStyle = compact ? styles.timePickerPartBtnSm : styles.timePickerPartBtn;
 
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
-      <button onClick={handleOpen} style={compact ? styles.timePickerBtnSm : styles.timePickerBtn}>
-        🕐 {formatMinutes(value)}
-      </button>
+      <span style={compact ? styles.timePickerSplitSm : styles.timePickerSplit}>
+        <button onClick={() => handleOpen("hour")} style={triggerBtnStyle} aria-label={`시간 ${currentHour}`}>
+          {currentHour}
+        </button>
+        <span style={compact ? styles.timePickerColonSm : styles.timePickerColon}>:</span>
+        <button onClick={() => handleOpen("min")} style={triggerBtnStyle} aria-label={`분 ${String(currentMin).padStart(2, "0")}`}>
+          {String(currentMin).padStart(2, "0")}
+        </button>
+      </span>
       {open && (
         <div style={styles.tpOverlay} onClick={() => setOpen(false)}>
           <div style={styles.tpPopup} onClick={(e) => e.stopPropagation()}>
@@ -1591,6 +1600,28 @@ const styles = {
     background: "#1e222a", color: "#8a95a8", fontSize: 10, fontWeight: 600, cursor: "pointer",
     whiteSpace: "nowrap",
   },
+  timePickerSplit: {
+    display: "inline-flex", alignItems: "center", gap: 3,
+    padding: 2, borderRadius: 8, background: "#151922", border: "1px solid #2a303a",
+    whiteSpace: "nowrap",
+  },
+  timePickerSplitSm: {
+    display: "inline-flex", alignItems: "center", gap: 2,
+    padding: 1, borderRadius: 5, background: "#151922", border: "1px solid #2a303a",
+    whiteSpace: "nowrap",
+  },
+  timePickerPartBtn: {
+    minWidth: 30, padding: "3px 6px", borderRadius: 6, border: "none",
+    background: "#1e222a", color: "#8a95a8", fontSize: 12, fontWeight: 700,
+    cursor: "pointer", textAlign: "center",
+  },
+  timePickerPartBtnSm: {
+    minWidth: 22, padding: "1px 4px", borderRadius: 4, border: "none",
+    background: "#1e222a", color: "#8a95a8", fontSize: 10, fontWeight: 700,
+    cursor: "pointer", textAlign: "center",
+  },
+  timePickerColon: { color: "#556", fontSize: 12, fontWeight: 800 },
+  timePickerColonSm: { color: "#556", fontSize: 10, fontWeight: 800 },
   tpOverlay: {
     position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
     background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center",
