@@ -477,6 +477,7 @@ export default function App() {
   const [courtCount, setCourtCount] = useState(2);
   const [totalHours, setTotalHours] = useState(2);
   const [slotMinutes, setSlotMinutes] = useState(30);
+  const [startMinute, setStartMinute] = useState(8 * 60);
   const [totalGames, setTotalGames] = useState(8); // 2코트 × 4타임
   const [mdCount, setMdCount] = useState(2);
   const [fdCount, setFdCount] = useState(2);
@@ -542,9 +543,9 @@ export default function App() {
     const newMap = {};
     r.stats.forEach((s) => { newMap[s.player.id] = nameMap[s.player.id] || ""; });
     setNameMap(newMap);
-    const startMin = slotTimes.length > 0 ? slotTimes[0].start : 0;
+    const startMin = slotTimes.length > 0 ? slotTimes[0].start : startMinute;
     setSlotTimes(buildSlotTimes(timeSlots, slotMinutes, startMin));
-  }, [males, females, courtCount, timeSlots, totalGames, effectiveMd, effectiveFd, effectiveMx, nameMap, slotTimes, slotMinutes]);
+  }, [males, females, courtCount, timeSlots, totalGames, effectiveMd, effectiveFd, effectiveMx, nameMap, slotTimes, slotMinutes, startMinute]);
 
   const handleFinishWizard = useCallback(() => {
     const g = totalGames || suggestedGames;
@@ -560,9 +561,9 @@ export default function App() {
     const newMap = {};
     r.stats.forEach((s) => { newMap[s.player.id] = nameMap[s.player.id] || ""; });
     setNameMap(newMap);
-    setSlotTimes(buildSlotTimes(ts, slotMinutes, 0));
+    setSlotTimes(buildSlotTimes(ts, slotMinutes, startMinute));
     setStep(2);
-  }, [males, females, courtCount, totalGames, suggestedGames, maleCount, femaleCount, nameMap, slotMinutes]);
+  }, [males, females, courtCount, totalGames, suggestedGames, maleCount, femaleCount, nameMap, slotMinutes, startMinute]);
 
   const handleSwapApply = useCallback((newPlayerId) => {
     if (!swapSel || !result) return;
@@ -653,13 +654,17 @@ export default function App() {
                 <div style={{ flex: 1 }}>
                   <NumberInput label="코트 수" value={courtCount} onChange={(v) => setCourtCount(v)} min={1} max={10} />
                   <NumberInput label="총 시간(h)" value={totalHours} onChange={(v) => setTotalHours(v)} min={1} max={8} />
-                  <NumberInput label="타임(분)" value={slotMinutes} onChange={(v) => setSlotMinutes(v)} min={15} max={60} step={5} />
+                  <NumberInput label="게임시간(분)" value={slotMinutes} onChange={(v) => setSlotMinutes(v)} min={15} max={60} step={5} />
+                  <div style={styles.wizardStartTimeRow}>
+                    <span style={styles.wizardStartTimeLabel}>게임 시작 시간 :</span>
+                    <TimePicker value={startMinute} onChange={setStartMinute} />
+                  </div>
                 </div>
                 <div style={styles.wizardCalcPreview}>
                   <div style={styles.wizardCalcFormula}>{courtCount}코트 × {rawSlots.toFixed(1)}타임</div>
                   {hasRemainder && <div style={styles.wizardCalcHint}>내림 처리</div>}
                   <div style={styles.wizardCalcPreviewNum}>{suggestedGames}게임</div>
-                  <button onClick={handleCalc} style={styles.wizardCalcBtnLg}>🔄 게임수 계산하기</button>
+                  <button onClick={handleCalc} style={styles.wizardCalcBtnLg}>⬇️ 게임수 아래에 입력</button>
                 </div>
               </div>
 
@@ -1430,6 +1435,11 @@ const styles = {
   wizardCountRow: { display: "flex", gap: 16 },
   wizardPlayerPreview: { fontSize: 11, color: "#556", marginTop: 4, textAlign: "center", letterSpacing: 2 },
   wizardCourtRow: { display: "flex", gap: 14 },
+  wizardStartTimeRow: {
+    marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between",
+    gap: 10, padding: "8px 10px", background: "#161a22", borderRadius: 8, border: "1px solid #222830",
+  },
+  wizardStartTimeLabel: { fontSize: 13, color: "#99a", fontWeight: 600, whiteSpace: "nowrap" },
   wizardCalcPanel: {
     flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
     background: "#1a2a18", borderRadius: 10, border: "1px solid #2a4a2e", padding: "12px 10px", gap: 6,
